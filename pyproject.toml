@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "envy-cli"
+version = "0.1.0"
+dependencies = [
+    "click",
+    "typer",
+    "python-dotenv",
+    "cryptography",
+    "pydantic",
+    "rich"
+]
+
+[project.scripts]
+envy = "envy.main:cli"
