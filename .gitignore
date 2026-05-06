@@ -1,0 +1,8 @@
+CLI_venv/
+# Ignore virtualenvs created by tooling
+*.venv*
+.venv/
+.venv-wsl/
+.venv-window/
+__pycache__/
+*.pyc
