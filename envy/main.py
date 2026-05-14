@@ -108,6 +108,29 @@ def install_hook_command(
     console.print(f"[green]Installed pre-commit hook at {hook_path}[/green]")
 
 
+@cli.command("agentic-scan")
+def agentic_scan_command(
+    root: Optional[Path] = typer.Option(None, "--root", help="Project root to scan (defaults to auto-detected root)."),
+    env_file: Path = typer.Option(Path(".env"), "--env-file", help="Env file to compare against."),
+    provider: str = typer.Option("anthropic", "--provider", help="Model provider: anthropic|openai|deepseek."),
+    model: str = typer.Option("claude-3-5-sonnet-20241022", "--model", help="Model name for the chosen provider."),
+    max_loops: int = typer.Option(30, "--max-loops", help="Maximum tool-use loops before aborting."),
+) -> None:
+    """Agentic security scan using Anthropic tool_use (repo exploration + final report)."""
+    from envy.core.agentic_scan import AgenticScanConfig, print_colored_report, run_agentic_scan
+
+    resolved_root = find_project_root(Path.cwd()) if root is None else root
+    config = AgenticScanConfig(
+        root=resolved_root,
+        env_file=env_file,
+        provider=provider,
+        model=model,
+        max_tool_loops=max_loops,
+    )
+    report = run_agentic_scan(config)
+    print_colored_report(report)
+
+
 @sync_app.command("push")
 def sync_push_command(
     env_file: Path = typer.Option(Path(".env"), "--env-file", help="Path to local .env file."),
