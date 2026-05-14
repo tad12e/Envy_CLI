@@ -6,3 +6,11 @@ CLI_venv/
 .venv-window/
 __pycache__/
 *.pyc
+
+# Envy generated artifacts
+envy.schema.generated.json
+
+# Local environment files (do NOT commit real secrets)
+.env
+.env.*
+!.env.example

@@ -1,18 +1,11 @@
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+# Envy.toml
+#
+# Optional project config for Envy.
+# (Currently used as a project-root marker; CLI options still take precedence.)
 
-[project]
-name = "envy-cli"
-version = "0.1.0"
-dependencies = [
-    "click",
-    "typer",
-    "python-dotenv",
-    "cryptography",
-    "pydantic",
-    "rich"
-]
-
-[project.scripts]
-envy = "envy.main:cli"
+[envy]
+env_file = ".env"
+schema_file = "envy.schema.json"
+docs_output = "README_ENV.md"
+sync_output_file = ".envy.sync"
+entropy_threshold = 4.3
