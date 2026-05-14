@@ -94,7 +94,7 @@ def scan_command(
     console.print("[red]Potential secret leaks detected:[/red]")
     for finding in findings:
         console.print(
-            f"- {finding['path']}:{finding['line']} entropy={finding['entropy']:.2f} token={finding['token'][:8]}..."
+            f"- {finding['path']}:{finding['line']} {finding['reason']} entropy={finding['entropy']:.2f} token={finding['token'][:8]}..."
         )
     raise typer.Exit(code=1)
 
