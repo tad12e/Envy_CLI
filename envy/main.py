@@ -6,6 +6,7 @@ from rich.console import Console
 
 from envy.core.docs import generate_readme_env
 from envy.core.entropy import install_pre_commit_hook, scan_files_for_entropy
+from envy.core.infer import find_project_root, infer_schema, write_inferred_schema
 from envy.core.schema import load_schema_definition, validate_env_file
 from envy.core.syncing import pull_sync_file, push_sync_file
 
@@ -23,9 +24,11 @@ def check_command(
         "--schema-file",
         help="Path to schema file (defaults: envy.schema.json or .env.template).",
     ),
+    infer: bool = typer.Option(False, "--infer", help="Infer schema from code and env file instead of loading one."),
 ) -> None:
     """Validate .env against a schema file or template."""
-    resolved_schema = load_schema_definition(schema_file)
+    root = find_project_root(Path.cwd())
+    resolved_schema = infer_schema(root, env_file) if infer else load_schema_definition(schema_file)
     report = validate_env_file(env_file, resolved_schema)
 
     if report["ok"]:
@@ -51,6 +54,30 @@ def docs_command(
     schema = load_schema_definition(schema_file)
     generate_readme_env(schema, output)
     console.print(f"[green]Wrote docs to {output}[/green]")
+
+
+@cli.command("infer-schema")
+def infer_schema_command(
+    root: Optional[Path] = typer.Option(None, "--root", help="Project root to scan for env usage (defaults to auto-detected root)."),
+    env_file: Optional[Path] = typer.Option(Path(".env"), "--env-file", help="Optional .env file to inspect."),
+    output: Path = typer.Option(Path("envy.schema.json"), "--output", help="Schema output file."),
+) -> None:
+    """Generate a schema from env usage in code and values in an env file."""
+    resolved_root = find_project_root(Path.cwd()) if root is None else root
+    count = write_inferred_schema(root=resolved_root, env_file=env_file, output=output)
+    console.print(f"[green]Inferred {count} variables into {output}[/green]")
+
+
+@cli.command("infer")
+def infer_schema_alias_command(
+    root: Optional[Path] = typer.Option(None, "--root", help="Project root to scan for env usage (defaults to auto-detected root)."),
+    env_file: Optional[Path] = typer.Option(Path(".env"), "--env-file", help="Optional .env file to inspect."),
+    output: Path = typer.Option(Path("envy.schema.json"), "--output", help="Schema output file."),
+) -> None:
+    """Alias for `infer-schema`."""
+    resolved_root = find_project_root(Path.cwd()) if root is None else root
+    count = write_inferred_schema(root=resolved_root, env_file=env_file, output=output)
+    console.print(f"[green]Inferred {count} variables into {output}[/green]")
 
 
 @cli.command("scan")
